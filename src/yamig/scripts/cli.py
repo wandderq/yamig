@@ -13,7 +13,7 @@ import sys
 import os
 
 
-class amigcli:
+class yamigcli:
     def __init__(self):
         self.argparser = self._init_argparser()
     
@@ -47,7 +47,7 @@ class amigcli:
             '-c', '--max-colors',
             default=64,
             type=int,
-            help='max colors in the target image (default: 64) (may be inaccurate, +-15% after quadtree)'
+            help='max colors in the target image (default: 64) (may be inaccurate, +-15%% after quadtree)'
         )
 
         argparser.add_argument(
@@ -260,10 +260,10 @@ class amigcli:
         args.max_script_length = self._parse_max_script_length(args.max_script_length)
         args.schema_name = self._parse_schema_name(args.input_path, args.schema_name, args.target_resolution)
 
-        self.start_amig(args)
+        self.start_yamig(args)
     
 
-    def start_amig(self, args) -> None:
+    def start_yamig(self, args) -> None:
         self.logger.info('amig started')
 
         self.logger.debug(f'image size (tile displays): {args.target_resolution[0]//32}x{args.target_resolution[1]//32}')
@@ -343,20 +343,15 @@ class amigcli:
         schema.write_clipboard()
 
 
-
-
 def run_cli() -> None:
     try:
-        amigcli().run_cli()
+        yamigcli().run_cli()
         sys.exit(0)
     
     except Exception as e:
         print(
             f'\033[31m{e.__class__.__name__}: {str(e)}.'
-            + (
-                f' Cause: {e.__cause__}\033[0m' if e.__cause__
-                else '\033[0m'
-            )
+            + (f' Cause: {e.__cause__}\033[0m' if e.__cause__ else '\033[0m')
         )
         sys.exit(1)
 

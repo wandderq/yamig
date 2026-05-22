@@ -27,9 +27,6 @@ class Preprocessor:
         img = Image.open(self.input_path).convert('RGB')
         
         self.logger.debug(f'original image resolution: {img.size}')
-
-        # colors_before = self._calculate_colors(img)
-        # self.logger.debug(f'approximate value of colors (original): {colors_before}')
         
         self.logger.info(f'quanting palette to {self.max_colors} colors')
         img = img.quantize(

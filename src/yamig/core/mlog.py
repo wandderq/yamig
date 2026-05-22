@@ -24,13 +24,7 @@ class MlogGenerator:
         for rect in rects:
             x, y, w, h, color = rect
 
-            flipped_rect = [
-                x,
-                self.target_resolution[1] - y - h,
-                w,
-                h,
-                color
-            ]
+            flipped_rect = [x, self.target_resolution[1]-y-h, w, h, color]
             flipped_rects.append(flipped_rect)
 
         return flipped_rects

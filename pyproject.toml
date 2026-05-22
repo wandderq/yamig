@@ -1,6 +1,6 @@
 [project]
 name = "yamig"
-version = "0.1.0"
+version = "0.1.1"
 description = "yet another mindustry image generator"
 authors = [
     { name = "wandderq", email = "wanddr.qq@gmail.com" }
