@@ -2,12 +2,14 @@ from argparse import ArgumentParser
 from pathlib import Path
 from colorlog import ColoredFormatter
 
+from yamig.core.mlog import MlogGenerator
 from yamig.core.preprocessor import Preprocessor
 from yamig.core.quadtree import QuadtreeProcessor
 
 import logging as lg
 import json
 import sys
+import os
 
 
 class amigcli:
@@ -44,7 +46,7 @@ class amigcli:
             '-c', '--max-colors',
             default=64,
             type=int,
-            help='max colors in the target image (default: 64)'
+            help='max colors in the target image (default: 64) (may be inaccurate, +-15% after quadtree)'
         )
 
         argparser.add_argument(
@@ -62,17 +64,17 @@ class amigcli:
         )
 
         argparser.add_argument(
-            '-l', '--max-code-length',
-            default=999,
+            '-l', '--max-script-length',
+            default=1000,
             type=int,
-            help='max lines of code in each processor (default: 999)'
+            help='max lines of script in each processor (default: 1000)'
         )
 
         argparser.add_argument(
             '-d', '--display-name',
             type=str,
             default='display1',
-            help='display to drawflush (default: display1)'
+            help='display to draw to (default: display1)'
         )
 
         argparser.add_argument(
@@ -198,20 +200,20 @@ class amigcli:
         return dispersion_threshold
     
 
-    def _parse_max_code_length(self, max_code_length: int) -> int:
-        if max_code_length < 1:
+    def _parse_max_script_length(self, max_script_length: int) -> int:
+        if max_script_length < 1:
             raise ValueError(
-                'Max code length value must be at least 1, '
-                f'got {max_code_length}'
+                'Max script length value must be at least 1, '
+                f'got {max_script_length}'
             )
         
-        if max_code_length > 1000:
+        if max_script_length > 1000:
             raise ValueError(
-                'Max code length value can\'t be higher than 1000, '
-                f'got {max_code_length}'
+                'Max script length value can\'t be higher than 1000, '
+                f'got {max_script_length}'
             )
         
-        return max_code_length
+        return max_script_length
 
 
     def run_cli(self) -> None:
@@ -232,7 +234,7 @@ class amigcli:
         args.max_colors = self._parse_max_colors(args.max_colors)
         args.min_region_size = self._parse_min_region_size(args.min_region_size)
         args.dispersion_threshold = self._parse_dispersion_threshold(args.dispersion_threshold)
-        args.max_code_length = self._parse_max_code_length(args.max_code_length)
+        args.max_script_length = self._parse_max_script_length(args.max_script_length)
 
         self.start_amig(args)
     
@@ -240,13 +242,15 @@ class amigcli:
     def start_amig(self, args) -> None:
         self.logger.info('amig started')
 
+        self.logger.debug(f'image size (tile displays): {args.target_resolution[0]//32}x{args.target_resolution[1]//32}')
+
         ### Preprocessing ###
         preprocessor = Preprocessor(
             args.input_path,
             args.target_resolution,
             args.max_colors
         )
-        image = preprocessor.run()
+        image, palette = preprocessor.run()
         
         # saving jpg
         preprocessed_image_path = args.output_path / 'preprocessed.jpg'
@@ -258,10 +262,10 @@ class amigcli:
         quadtree = QuadtreeProcessor(
             image,
             args.min_region_size,
-            args.dispersion_threshold
+            args.dispersion_threshold,
+            palette
         )
-        rects_np = quadtree.decompose(0, 0, *args.target_resolution)
-        rects = quadtree.rects2int(rects_np)
+        rects = quadtree.rects2int(quadtree.decompose(0, 0, *args.target_resolution))
 
         self.logger.info(f'image decomposed to {len(rects)} rects (~{len(rects)//900} processors)')
 
@@ -276,9 +280,30 @@ class amigcli:
         recomposed_image_path = args.output_path / 'quadtree_recomposed.jpg'
         self.logger.debug(f'saving recomposed image to {str(recomposed_image_path)}')
         recomposed_image.save(recomposed_image_path)
-        
 
-        
+        ### Mlog ###
+        mlog_generator = MlogGenerator(
+            args.max_script_length,
+            args.display_name,
+            args.target_resolution
+        )
+        scripts = mlog_generator.generate_mlog(rects)
+
+        # removing previous scripts
+        scripts_path = args.output_path / 'scripts'
+        scripts_path.mkdir(exist_ok=True)
+
+        for script in scripts_path.iterdir():
+            os.remove(script)
+
+        # saving scripts
+        for script_i, script in enumerate(scripts, start=1):
+            self.logger.debug(f'saving script {script_i}')
+            with (scripts_path / f'processor_{script_i}.txt').open(mode='w') as file:
+                file.write('\n'.join(script))
+
+
+
 
 def run_cli() -> None:
     try:

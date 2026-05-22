@@ -1,18 +1,23 @@
 import logging as lg
 from PIL import Image, ImageDraw
+from scipy.spatial import cKDTree
 import numpy as np
 
 class QuadtreeProcessor:
     def __init__(self,
         image: Image,
         min_region_size: int,
-        dispersion_threshold: int
+        dispersion_threshold: int,
+        palette: np.array
     ):
         self.logger = lg.getLogger('amig.quadtree')
-        self.image_array = np.array(image)
+        self.image_array = np.array(image, dtype=np.float16)
         self.min_region_size = min_region_size
         self.dispersion_threshold = dispersion_threshold
-    
+
+        self.palette = palette
+        self.color_tree = cKDTree(palette)
+
 
     def decompose(self, x: int, y: int, w: int, h: int) -> list:
         # self.logger.debug(f'processing region: ({x};{y}) {w}x{h}')
@@ -28,7 +33,8 @@ class QuadtreeProcessor:
             or h <= self.min_region_size
             or region_dispersion <= self.dispersion_threshold
         ):
-            rect_color = tuple(np.clip(region_mean_color, 0, 255).astype(int))
+            _, idx = self.color_tree.query(region_mean_color)
+            rect_color = tuple(self.palette[idx])
             rects.append((x, y, w, h, rect_color))
         
         else:
