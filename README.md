@@ -2,7 +2,9 @@
 yet another mindustry image generator
 
 yamig uses tiled logic displays and microprocessors
+
 for now it only works in CLI (mby i'll make a mod for Mindustry)
+
 **the project is still raw and contains many errors, inaccuracies, workarounds, and typos (feel free to open bug reports on GitHub)**
 
 ## Usage
