@@ -46,10 +46,10 @@ options:
 ## TODO
 - [ ] find and fix typos
 - [ ] more logging
-- [ ] -q/--quiet mode
+- [x] -q/--quiet mode
 - [ ] schema tags
-- [ ] onefile mode (without preoprocessed.jpg, recomposed.jpg, scripts/, etc.)
-- [ ] -C/--copy-to-clipboard instead of automatically copying
+- [x] onefile mode (without preoprocessed.jpg, recomposed.jpg, scripts/, etc.)
+- [x] -C/--copy-to-clipboard instead of automatically copying
 - [ ] make this readme more organized and readable
 
 ## Licensing
