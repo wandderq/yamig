@@ -9,36 +9,39 @@ for now it only works in CLI (mby i'll make a mod for Mindustry)
 
 ## Usage
 ```
-usage: yamig [-h] [-o OUTPUT_PATH] [-r TARGET_RESOLUTION] [-c MAX_COLORS] [-R MIN_REGION_SIZE] [-t DISPERSION_THRESHOLD] [-l MAX_SCRIPT_LENGTH] [-d DISPLAY_NAME]
-             [-N SCHEMA_NAME] [-D SCHEMA_DESCRIPTION] [-v]
+usage: yamig [-h] [-o OUTPUT_PATH] [-O] [-C] [-r RESOLUTION] [-c MAX_COLORS] [-t DISPERSION_THRESHOLD]
+             [-s MIN_REGION_SIZE] [-l MAX_SCRIPT_LEN] [-N SCHEMA_NAME] [-D SCHEMA_DESC] [-v | -q | --silent]
              input_path
 
-yet another mindustry image generator
+yet another mindustry image generator v0.1.1
 
 positional arguments:
-  input_path            input image filepath
+  input_path            input image path
 
 options:
   -h, --help            show this help message and exit
-  -o, --output-path OUTPUT_PATH
-                        output directory (default: derived from input_path)
-  -r, --target-resolution TARGET_RESOLUTION
-                        target resolution (default: 320x192)
+  -o, --output OUTPUT_PATH
+                        output directory (default: derived from args)
+  -O, --onefile         save only .msch file
+  -C, --copy-to-clipboard
+                        copy schematic to clipboard
+  -r, --resolution RESOLUTION
+                        target resolution (format: WxH[b/px]) (default: 5x5b)
   -c, --max-colors MAX_COLORS
-                        max colors in the target image (default: 64) (may be inaccurate, +-15% after quadtree)
-  -R, --min-region-size MIN_REGION_SIZE
-                        minimal quadtree region size (px) (default: 8)
+                        max target image colors (default: 64) (up to 15% loss)
   -t, --dispersion-threshold DISPERSION_THRESHOLD
                         quadtree color dispersion threshold (default: 600)
-  -l, --max-script-length MAX_SCRIPT_LENGTH
-                        max lines of script in each processor (default: 1000)
-  -d, --display-name DISPLAY_NAME
-                        display to draw to (default: display1)
+  -s, --min-region-size MIN_REGION_SIZE
+                        min quadtree region size (px) (default: 8)
+  -l, --max-script-len MAX_SCRIPT_LEN
+                        max lines of script in each processor (default: 100)
   -N, --schema-name SCHEMA_NAME
-                        output schematic name (default: derived from other args)
-  -D, --schema-description SCHEMA_DESCRIPTION
-                        output schematic description (default: None)
-  -v, --verbose         debug logs
+                        schematic name (default: derived from args)
+  -D, --schema-desc SCHEMA_DESC
+                        schematic description (default: derived from args)
+  -v, --verbose         verbose mode (debug logs)
+  -q, --quiet           quiet mode (warn/err logs)
+  --silent              silent mode (no logs)
 ```
 ## TODO
 - [ ] find and fix typos
