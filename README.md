@@ -51,6 +51,8 @@ options:
 - [x] onefile mode (without preoprocessed.jpg, recomposed.jpg, scripts/, etc.)
 - [x] -C/--copy-to-clipboard instead of automatically copying
 - [ ] make this readme more organized and readable
+- [ ] remove scipy dependency (np.argmin instead of cKDTree)
+- [ ] use uint8 instead of float32
 
 ## Licensing
 this project is distributed under the **MIT License**
